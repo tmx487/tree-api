@@ -17,6 +17,8 @@ namespace TreeAPI.Application.Services
 
         public async Task CreateNewNodeAsycn(string treeName, long parentNodeId, string nodeName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (string.IsNullOrWhiteSpace(treeName))
                 throw new ArgumentException("Tree name cannot be null or empty ", nameof(treeName));
 
@@ -58,6 +60,8 @@ namespace TreeAPI.Application.Services
 
         public async Task CreateTreeAsync(string treeName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (string.IsNullOrWhiteSpace(treeName))
             {
                 throw new ArgumentException("Tree name cannot be null or empty ", nameof(treeName));
@@ -70,6 +74,7 @@ namespace TreeAPI.Application.Services
 
         public Task DeleteNodeAsync(string treeName, long nodeId, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             throw new NotImplementedException();
         }
 
@@ -83,7 +88,9 @@ namespace TreeAPI.Application.Services
         /// </returns>
         public async Task<List<Node>> GetTreeNodesAsync(string treeName, CancellationToken cancellationToken)
         {
-           var sql = $@"
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var sql = $@"
                 WITH RECURSIVE TreeHierarchy AS (
                     SELECT
                         n.""Id"",
@@ -140,11 +147,17 @@ namespace TreeAPI.Application.Services
         }
 
         public async Task<Tree?> GetTreeByNameAsycn(string treeName, CancellationToken cancellationToken)
-        => await _context.Trees
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await _context.Trees
             .FirstOrDefaultAsync(t => t.TreeName == treeName, cancellationToken);
+        }
 
         public Task RenameNodeAsync(string treeName, long nodeId, string newNodeName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             throw new NotImplementedException();
         }
     }
