@@ -7,8 +7,9 @@ namespace TreeAPI.Domain.Entities
     {
         private List<Node> _children = new List<Node>();
         private Node() { }
-        private Node(long parentNodeId, string nodeName)
+        private Node(long treeId, long? parentNodeId, string nodeName)
         {
+            TreeId = treeId;
             ParentNodeId = parentNodeId;
             Name = nodeName;
         }
@@ -29,8 +30,8 @@ namespace TreeAPI.Domain.Entities
 
         public IReadOnlyCollection<Node> Children => _children;
 
-        public static Node Create(long parentNodeId, string nodeName)
-            => new Node(parentNodeId,nodeName);
+        public static Node Create(long treeId, long? parentNodeId, string nodeName)
+            => new Node(treeId, parentNodeId,nodeName);
 
         public void AddNewNode(Node node)
         {
