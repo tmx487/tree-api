@@ -17,7 +17,7 @@ namespace TreeAPI.Domain.Entities
         public long Id { get; init; }
 
         [Required]
-        public string Name { get; init; } = default!;
+        public string Name { get; private set; } = default!;
         public long TreeId { get; init; }
 
         [ForeignKey("TreeId")]
@@ -35,6 +35,11 @@ namespace TreeAPI.Domain.Entities
         public void AddNewNode(Node node)
         {
             _children.Add(node);
+        }
+
+        public void RenameNode(string newNodeName)
+        {
+            Name = newNodeName;
         }
     }
 }

@@ -175,11 +175,29 @@ namespace TreeAPI.Application.Services
             .FirstOrDefaultAsync(t => t.TreeName == treeName, cancellationToken);
         }
 
-        public Task RenameNodeAsync(string treeName, long nodeId, string newNodeName, CancellationToken cancellationToken)
+        public async Task RenameNodeAsync(string treeName, long nodeId, string newNodeName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(treeName))
+            {
+                throw new ArgumentException("Tree name cannot be null or empty ", nameof(treeName));
+            }
+
+            if (string.IsNullOrWhiteSpace(newNodeName))
+            {
+                throw new ArgumentException("New node's name cannot be null or empty ", nameof(newNodeName));
+            }
+            var nodeToRename = await _context.Nodes
+                .FirstOrDefaultAsync(n => n.Id == nodeId && n.Tree.TreeName == treeName, cancellationToken);
+
+            if (nodeToRename is null)
+            {
+                throw new SecureException($"Node with ID {nodeId} not found");
+            }
+
+            nodeToRename.RenameNode(newNodeName);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

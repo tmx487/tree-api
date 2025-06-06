@@ -116,12 +116,13 @@ namespace TreeAPI.Controllers
             Description = "Rename an existing node in your tree. You must specify a node ID that belongs your tree. A new name of the node must be unique across all siblings.",
             Tags = new[] { "user.tree.node" }
             )]
-        public IActionResult Rename(
+        public async Task<IActionResult> Rename(
             [FromQuery, Required] string treeName,
             [FromQuery, Required] long nodeId,
             [FromQuery, Required] string newNodeName,
             CancellationToken cancellationToken)
         {
+            await _treeService.RenameNodeAsync(treeName, nodeId, newNodeName, cancellationToken);
             return Ok("Successful response");
         }
     }
