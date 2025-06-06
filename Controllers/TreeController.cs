@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using TreeAPI.Application.Abstractions;
 using TreeAPI.Dto;
+using TreeAPI.Filters;
 using TreeAPI.Mapping;
 
 namespace TreeAPI.Controllers
@@ -92,11 +93,12 @@ namespace TreeAPI.Controllers
             Description = "Delete an existing node in your tree. You must specify a node ID that belongs your tree.",
             Tags = new[] { "user.tree.node" }
             )]
-        public IActionResult Delete(
+        public async Task<IActionResult> Delete(
             [FromQuery, Required] string treeName,
             [FromQuery, Required] long nodeId,
             CancellationToken cancellationToken)
         {
+            await _treeService.DeleteNodeAsync(treeName, nodeId, cancellationToken);
             return Ok("Successful response");
         }
 

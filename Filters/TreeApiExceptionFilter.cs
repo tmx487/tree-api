@@ -40,7 +40,14 @@ namespace TreeAPI.Filters
                 }
             }
 
-            await _journalService.LogExceptionAsync(eventId, queryParams, bodyParams, context.Exception, context.HttpContext.RequestAborted);
+            try
+            {
+                await _journalService.LogExceptionAsync(eventId, queryParams, bodyParams, context.Exception, context.HttpContext.RequestAborted);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred while saving to DB: {DbSavingException}", context.Exception);
+            }
 
             if (context.Exception is SecureException secureException)
             {

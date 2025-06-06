@@ -2,6 +2,7 @@
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using TreeAPI.Extensions;
+using TreeAPI.Filters;
 
 namespace TreeAPI
 {
@@ -11,8 +12,13 @@ namespace TreeAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
-            
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<TreeApiExceptionFilter>();
+            });
+
+            builder.Services.AddScoped<TreeApiExceptionFilter>();
+
             builder.Services.AddEndpointsApiExplorer();
 
             builder.Services.AddSwagger();

@@ -21,6 +21,7 @@ namespace TreeAPI.Application.Services
             {
                 EventId = eventId,
                 Timestamp = DateTime.UtcNow,
+                Message = ex.Message ?? "Unknown error",
                 QueryParameters = queryParams,
                 BodyParameters = bodyParams,
                 StackTrace = ex.ToString()

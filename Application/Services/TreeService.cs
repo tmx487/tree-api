@@ -72,10 +72,31 @@ namespace TreeAPI.Application.Services
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public Task DeleteNodeAsync(string treeName, long nodeId, CancellationToken cancellationToken)
+        public async Task DeleteNodeAsync(string treeName, long nodeId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(treeName))
+            {
+                throw new ArgumentException("Tree name cannot be null or empty ", nameof(treeName));
+            }
+
+            var nodeToDelete = await _context.Nodes
+                .AsNoTracking()
+                .Include(n => n.Children)
+                .FirstOrDefaultAsync(n => n.Id == nodeId && n.Tree.TreeName == treeName, cancellationToken);
+
+            if (nodeToDelete is null)
+            {
+                throw new SecureException("Node to delete not found.");
+            }
+
+            if (nodeToDelete.Children.Any())
+            {
+                throw new SecureException("Delete all children first.");
+            }
+
+            _context.Nodes.Remove(nodeToDelete);
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
         /// <summary>

@@ -12,6 +12,7 @@ namespace TreeAPI.Extensions
         public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
             services.AddScoped<ITreeService, TreeService>();
+            services.AddScoped<IJournalService, JournalService>();
             return services;
         }
 
