@@ -15,30 +15,39 @@ namespace TreeAPI.Application.Services
             _context = dbContext;
         }
 
-        public async Task CreateNewNodeAsycn(string treeName, long parentNodeId, string nodeName, CancellationToken cancellationToken)
+        public async Task CreateNodeAsync(string treeName, long parentNodeId, string nodeName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             if (string.IsNullOrWhiteSpace(treeName))
                 throw new ArgumentException("Tree name cannot be null or empty ", nameof(treeName));
+            var tree = await _context.Trees
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.TreeName == treeName, cancellationToken);
+
+            if (tree is null)
+            {
+                throw new TreeNotFoundException($"Tree with name {treeName} not found.");
+            }
 
             if (string.IsNullOrWhiteSpace(nodeName))
                 throw new ArgumentException("Node name cannot be null or empty ", nameof(nodeName));
 
-            var parentNode = await _context.Nodes.FirstOrDefaultAsync(
-                n => n.Id == parentNodeId && n.Tree.TreeName.Equals(treeName, StringComparison.OrdinalIgnoreCase),
-                cancellationToken) ?? throw new NodeNotFoundException($"Parent node with id {parentNodeId} not found in this isTreeExists.");
+            var isNodeAlreadyExist = await _context.Nodes
+                .AnyAsync(n => n.Name == nodeName && n.TreeId == tree.Id, cancellationToken);
+
+            if (isNodeAlreadyExist)
+            {
+                throw new NodeAlreadyExists($"Node with name {nodeName} already exists.");
+            }
+
+            var parentNode = await _context.Nodes
+                .FirstOrDefaultAsync(n => n.Id == parentNodeId && n.Tree.TreeName == tree.TreeName, cancellationToken)
+                ?? throw new NodeNotFoundException($"Parent node with id {parentNodeId} not found in this tree.");
 
             if (!parentNode.Tree.TreeName.Equals(treeName, StringComparison.OrdinalIgnoreCase))
             {
-                throw new SecureException($"Parent node with id {parentNodeId} belongs to a different isTreeExists ({parentNode.Tree.TreeName}).");
-            }
-
-            if (await _context.Nodes.AnyAsync(
-                n => n.ParentNodeId == parentNodeId && n.Tree.TreeName.Equals(treeName, StringComparison.OrdinalIgnoreCase) && n.Name == nodeName,
-                cancellationToken))
-            {
-                throw new SecureException("A sibling node with the same name already exists.");
+                throw new SecureException($"Parent node with id {parentNodeId} belongs to a different tree ({parentNode.Tree.TreeName}).");
             }
 
             var newNode = Node.Create(parentNodeId, nodeName);
@@ -75,6 +84,7 @@ namespace TreeAPI.Application.Services
         public async Task DeleteNodeAsync(string treeName, long nodeId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
             if (string.IsNullOrWhiteSpace(treeName))
             {
                 throw new ArgumentException("Tree name cannot be null or empty ", nameof(treeName));
@@ -87,7 +97,7 @@ namespace TreeAPI.Application.Services
 
             if (nodeToDelete is null)
             {
-                throw new SecureException("Node to delete not found.");
+                throw new SecureException($"Node with ID {nodeId} not found.");
             }
 
             if (nodeToDelete.Children.Any())
@@ -193,7 +203,7 @@ namespace TreeAPI.Application.Services
 
             if (nodeToRename is null)
             {
-                throw new SecureException($"Node with ID {nodeId} not found");
+                throw new SecureException($"Node with ID {nodeId} not found.");
             }
 
             nodeToRename.RenameNode(newNodeName);

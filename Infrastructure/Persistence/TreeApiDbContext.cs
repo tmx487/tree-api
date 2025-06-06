@@ -22,6 +22,8 @@ namespace TreeAPI.Infrastructure.Persistence
 
                 entity.HasKey(n => n.Id);
 
+                entity.HasIndex(n => new {n.TreeId, n.Name}).IsUnique();
+
                 entity.Property(n => n.Name)
                     .IsRequired()
                     .HasMaxLength(100);

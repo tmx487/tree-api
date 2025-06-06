@@ -4,7 +4,7 @@ namespace TreeAPI.Application.Abstractions
 {
     public interface ITreeService
     {
-        Task CreateNewNodeAsycn(string treeName, long parentNodeId, string nodeName, CancellationToken cancellationToken);
+        Task CreateNodeAsync(string treeName, long parentNodeId, string nodeName, CancellationToken cancellationToken);
         Task CreateTreeAsync(string treeName, CancellationToken cancellationToken);
         Task DeleteNodeAsync(string treeName, long nodeId, CancellationToken cancellationToken);
         Task RenameNodeAsync(string treeName, long nodeId, string newNodeName, CancellationToken cancellationToken);

@@ -72,12 +72,13 @@ namespace TreeAPI.Controllers
             Description = "",
             Tags = new[] { "user.tree.node" }
             )]
-        public IActionResult Create(
+        public async Task<IActionResult> Create(
             [FromQuery, Required] string treeName,
             [FromQuery, Required] long parentNodeId,
             [FromQuery, Required] string nodeName,
             CancellationToken cancellationToken)
         {
+            await _treeService.CreateNodeAsync(treeName, parentNodeId, nodeName, cancellationToken);
             return Ok("Successful response");
         }
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TreeAPI.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using TreeAPI.Infrastructure.Persistence;
 namespace TreeAPI.Migrations
 {
     [DbContext(typeof(TreeApiDbContext))]
-    partial class TreeApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250606094403_AddUniqueConstraintOnNodeName")]
+    partial class AddUniqueConstraintOnNodeName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
