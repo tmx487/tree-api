@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -6,25 +8,47 @@ using System.Net;
 using System.Text.Json;
 using TreeAPI.Application.Abstractions;
 using TreeAPI.Filters;
+using TreeAPI.Infrastructure.Persistence;
 
 namespace TreeAPI.IntegrationTests;
 
-public class TreeApiExceptionFilterTests : IClassFixture<WebApplicationFactory<Program>>
+public class TreeApiExceptionFilterTests : IClassFixture<CustomWebApplicationFactory>, IDisposable
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
     private readonly Mock<IJournalService> _mockJournalService;
     private readonly Mock<ILogger<TreeApiExceptionFilter>> _mockLogger;
+    private readonly TreeApiDbContext _context;
+    private IDbContextTransaction _transaction;
     private readonly HttpClient _client;
 
-    public TreeApiExceptionFilterTests(WebApplicationFactory<Program> factory)
+    public TreeApiExceptionFilterTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
         _client = _factory.CreateClient();
 
-        _mockJournalService = new Mock<IJournalService>();
-        _mockLogger = new Mock<ILogger<TreeApiExceptionFilter>>();
+        _mockJournalService = _factory.MockJournalService;
+        _mockLogger = _factory.MockLogger;
 
-        _cofigureTexstingContext(_factory);
+        var scope = _factory.Services.CreateScope();
+        _context = scope.ServiceProvider.GetRequiredService<TreeApiDbContext>();
+
+        _transaction = _context.Database.BeginTransaction();
+
+        _mockJournalService
+            .Setup(x => x.LogExceptionAsync(
+                It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<Exception>(), It.IsAny<CancellationToken>()
+            ))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+    }
+
+    public void Dispose()
+    {
+        _transaction?.Rollback();
+        _transaction?.Dispose();
+
+        _context?.Dispose();
     }
 
     [Fact]
