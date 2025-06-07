@@ -30,7 +30,7 @@ namespace TreeAPI.Filters
             }
 
             string? bodyParams = string.Empty;
-            if (request.Body.CanRead && request.ContentLength > 0)
+            if (request.Body.CanRead && request.ContentLength.HasValue)
             {
                 request.EnableBuffering();
                 using (var reader = new System.IO.StreamReader(request.Body, System.Text.Encoding.UTF8, true, 1024, true))
