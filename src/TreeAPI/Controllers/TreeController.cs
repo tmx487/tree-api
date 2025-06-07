@@ -36,7 +36,7 @@ namespace TreeAPI.Controllers
         [ProducesResponseType(typeof(string), 200)]
         [SwaggerOperation(
             Summary = "",
-            Description = "Returns your entire tree. If your tree doesn't exist it will be created automatically.",
+            Description = "Returns an entire tree. If your tree doesn't exist it will be created automatically.",
             Tags = new[] { "user.tree" }
             )]
         public async Task<IActionResult> Get([FromQuery, Required] string treeName, CancellationToken cancellationToken)
@@ -65,7 +65,7 @@ namespace TreeAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("node/create")]
+        [Route("node-create")]
         [ProducesResponseType(typeof(string), 200)]
         [SwaggerOperation(
             Summary = "",
@@ -87,7 +87,7 @@ namespace TreeAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("node/delete")]
+        [Route("node-delete")]
         [ProducesResponseType(typeof(string), 200)]
         [SwaggerOperation(
             Summary = "",
@@ -110,7 +110,7 @@ namespace TreeAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("node/rename")]
+        [Route("node-rename")]
         [ProducesResponseType(typeof(string), 200)]
         [SwaggerOperation(
             Summary = "",
