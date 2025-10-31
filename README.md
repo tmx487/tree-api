@@ -3,7 +3,7 @@
 ### 1\. Clone the repository
 
 ```bash
-git clone https://github.com/solara999/tree-api.git
+git clone https://github.com/tmx487/tree-api.git
 ```
 
 ### 2\. Launch the containers
